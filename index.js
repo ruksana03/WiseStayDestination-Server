@@ -53,10 +53,10 @@ app.post("/rooms", async (req, res) => {
     try {
         const body = req.body;
         const result = await roomCollection.insertOne(body);
-        // console.log(result);
+        console.log(result);
         res.send(result);
     } catch (err) {
-        // console.log(err);
+        console.log(err);
         res.send(err);
     }
 })
@@ -68,7 +68,7 @@ app.get('/rooms', async (req, res) => {
         const result = await roomCollection.find().toArray();
         res.send(result);
     } catch (err) {
-        // console.log(err);
+        console.log(err);
     }
 })
 
@@ -76,10 +76,10 @@ app.get('/rooms', async (req, res) => {
 app.get("/rooms/:id", async (req, res) => {
     try {
         const rooms = await roomCollection.findOne({ _id: new ObjectId(req.params.id) });
-        // console.log(rooms);
+        console.log(rooms);
         res.send(rooms);
     } catch (error) {
-        // console.log(error);
+        console.log(error);
     }
 })
 
@@ -90,9 +90,9 @@ app.delete("/rooms/:id", async (req, res) => {
         const query = { _id: new ObjectId(id) };
         const result = await roomCollection.deleteOne(query);
         res.send(result);
-        // console.log(result)
+        console.log(result)
     } catch (err) {
-        // console.log(err);
+        console.log(err);
     }
 })
 
@@ -108,10 +108,10 @@ app.put("/rooms/:id", async (req, res) => {
         };
         const option = { upsert: true };
         const result = await roomCollection.updateOne(id, updatedData, option);
-        // console.log(body);
+        console.log(body);
         res.send(result);
     } catch (err) {
-        // console.log(err);
+        console.log(err);
     }
 })
 
@@ -121,10 +121,10 @@ app.post("/subscription", async (req, res) => {
     try {
         const body = req.body;
         const result = await subscriptionCollection.insertOne(body);
-        // console.log(result);
+        console.log(result);
         res.send(result);
     } catch (err) {
-        // console.log(err);
+        console.log(err);
         res.send(err);
     }
 })
@@ -135,7 +135,7 @@ app.get('/subscription', async (req, res) => {
         const result = await subscriptionCollection.find().toArray();
         res.send(result);
     } catch (err) {
-        // console.log(err);
+        console.log(err);
     }
 })
 
@@ -143,10 +143,10 @@ app.get('/subscription', async (req, res) => {
 app.get("/subscription/:id", async (req, res) => {
     try {
         const subscribe = await subscriptionCollection.findOne({ _id: new ObjectId(req.params.id) });
-        // console.log(subscribe);
+        console.log(subscribe);
         res.send(subscribe);
     } catch (error) {
-        // console.log(error);
+        console.log(error);
     }
 })
 
@@ -161,7 +161,7 @@ app.post("/reviews", async (req, res) => {
         console.log(result);
         res.send(result);
     } catch (err) {
-        // console.log(err);
+        console.log(err);
         res.send(err);
     }
 })
@@ -170,9 +170,9 @@ app.post("/reviews", async (req, res) => {
 app.get('/reviews', async (req, res) => {
     try {
         const result = await reviewCollection.find().toArray();
-        // res.send(result);
+        res.send(result);
     } catch (err) {
-        // console.log(err);
+        console.log(err);
     }
 })
 
@@ -180,15 +180,14 @@ app.get('/reviews', async (req, res) => {
 app.get("/reviews/:id", async (req, res) => {
     try {
         const review = await reviewCollection.findOne({ _id: new ObjectId(req.params.id) });
-        // console.log(review);
+        console.log(review);
         res.send(review);
     } catch (error) {
-        // console.log(error);
+        console.log(error);
     }
 })
 
-
-// User Booking 
+// booking Start 
 
 app.post("/booking", async (req, res) => {
     try {
@@ -197,78 +196,90 @@ app.post("/booking", async (req, res) => {
         const result = await bookingCollection.insertOne(body);
         console.log(result);
         res.send(result);
-        // console.log(result);
+        console.log(result);
         res.send(result);
     } catch (err) {
-        // console.log(err);
+        console.log(err);
         res.send(err);
     }
 })
-// get
+
+app.get('/checkAvailability', async (req, res) => {
+    try {
+      const { roomNum, checkInDate, checkOutDate } = req.query;
+  
+      // Check if there are any bookings for the given room and date range
+      const existingBooking = await bookingCollection.findOne({
+        roomNum,
+        $or: [
+          { checkInDate: { $lt: checkOutDate }, checkOutDate: { $gt: checkInDate } },
+          { checkInDate: { $gte: checkInDate, $lte: checkOutDate } },
+        ],
+      });
+  
+      // Respond with availability status
+      res.send({ available: !existingBooking });
+    } catch (error) {
+      console.error('Error while checking room availability:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
+
+// // get
 
 app.get('/bookings', async (req, res) => {
     try {
         const result = await bookingCollection.find().toArray();
         res.send(result);
     } catch (err) {
-        // console.log(err);
+        console.log(err);
     }
 })
 
-app.get('/bookings', async (req, res) => {
+app.get("/bookings/:id", async (req, res) => {
     try {
-      const email = req.query.email;
-      const bookings = await bookingCollection.find({ userEmail: email }).toArray();
-      res.json(bookings);
+        const bookingRoom = await bookingCollection.findOne({ _id: new ObjectId(req.params.id) });
+        console.log(bookingRoom);
+        res.send(bookingRoom);
     } catch (error) {
-      console.error('Error fetching bookings:', error);
-      res.status(500).send('Internal Server Error');
+        console.log(error);
     }
-  });
+})
+
+// update : Put ::::::::::::::::::
+app.put("/bookings/:id", async (req, res) => {
+    try {
+        const id = { _id: new ObjectId(req.params.id) };
+        const body = req.body;
+        const updatedData = {
+            $set: {
+                ...body,
+            },
+        };
+        const option = { upsert: true };
+        const result = await bookingCollection.updateOne(id, updatedData, option);
+        console.log(body);
+        res.send(result);
+    } catch (err) {
+        console.log(err);
+    }
+})
+
+// delete 
+app.delete("/bookings/:id", async (req, res) => {
+    try {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const result = await bookingCollection.deleteOne(query);
+        res.send(result);
+        console.log(result)
+    } catch (err) {
+        console.log(err);
+    }
+})
 
 
-
-
-
-
-
-
-
-
-// app.get('/checkRoomAvailability', (req, res) => {
-//     const { roomNo, checkInDate, checkOutDate } = req.query;
-
-//     // Convert string dates to Date objects for comparison
-//     const startDate = new Date(checkInDate);
-//     const endDate = new Date(checkOutDate);
-
-//     // Check if the selected date range overlaps with any existing bookings
-//     const isRoomAvailable = bookings.every((booking) => {
-//       const bookedStartDate = new Date(booking.checkInDate);
-//       const bookedEndDate = new Date(booking.checkOutDate);
-
-//       return (
-//         startDate >= bookedEndDate || endDate <= bookedStartDate
-//       );
-//     });
-
-//     res.json({ available: isRoomAvailable });
-//   });
-
-// app.get('/booking',async(req,res)=>{
-//     const cursor = bookingCollection.find();
-//     const result = await cursor.toArray();
-//     res.send(result);
-// })
-// app.get('/booking/:id',async(req,res)=>{
-//     const id = req.params.id;
-//     const query = {_id: new ObjectId(id)}
-//     const options = {
-//         projection : {title:1, price:1,},
-//     };
-//     const result = await bookingCollection.findOne(query,options);
-//     res.send(result)
-// })
 
 
 app.get('/', (req, res) => {
