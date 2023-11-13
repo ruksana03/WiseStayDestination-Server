@@ -220,7 +220,7 @@ app.get('/checkAvailability', async (req, res) => {
         // Respond with availability status
         res.send({ available: !existingBooking });
     } catch (error) {
-        console.log(err);
+        console.log(error);
         // res.send(err);
     }
 });
@@ -308,20 +308,6 @@ app.post("/userReviewsForRoom", async (req, res) => {
 });
 
 
-// app.post("/userReviewsForRoom", async (req, res) => {
-//     try {
-
-//         const body = req.body;
-//         const result = await userRoomReviewCollection.insertOne(body);
-//         console.log(result);
-//         res.send(result);
-//         console.log(result);
-//         res.send(result);
-//     } catch (err) {
-//         console.log(err);
-//         // res.send(err);
-//     }
-// })
 
 app.get('/userReviewsForRoom', async (req, res) => {
     try {
@@ -341,7 +327,6 @@ app.get("/userReviewsForRoom/:id", async (req, res) => {
         console.log(error);
     }
 })
-
 
 
 app.get('/', (req, res) => {
