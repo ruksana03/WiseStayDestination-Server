@@ -62,7 +62,6 @@ app.post("/rooms", async (req, res) => {
     }
 })
 
-
 // Get all
 app.get('/rooms', async (req, res) => {
     try {
@@ -188,7 +187,7 @@ app.get("/reviews/:id", async (req, res) => {
     }
 })
 
-// booking Start 
+// booking Start :::
 
 app.post("/booking", async (req, res) => {
     try {
