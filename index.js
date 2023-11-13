@@ -46,6 +46,7 @@ const roomCollection = database.collection('rooms');
 const subscriptionCollection = database.collection('subscription');
 const reviewCollection = database.collection('reviews');
 const bookingCollection = database.collection('booking');
+const userRoomReviewCollection = database.collection('RoomReview');
 
 // ::::::::: add room ::::::::::::
 // post 
@@ -206,25 +207,24 @@ app.post("/booking", async (req, res) => {
 
 app.get('/checkAvailability', async (req, res) => {
     try {
-      const { roomNum, checkInDate, checkOutDate } = req.query;
-  
-      // Check if there are any bookings for the given room and date range
-      const existingBooking = await bookingCollection.findOne({
-        roomNum,
-        $or: [
-          { checkInDate: { $lt: checkOutDate }, checkOutDate: { $gt: checkInDate } },
-          { checkInDate: { $gte: checkInDate, $lte: checkOutDate } },
-        ],
-      });
-  
-      // Respond with availability status
-      res.send({ available: !existingBooking });
+        const { roomNum, checkInDate, checkOutDate } = req.query;
+
+        // Check if there are any bookings for the given room and date range
+        const existingBooking = await bookingCollection.findOne({
+            roomNum,
+            $or: [
+                { checkInDate: { $lt: checkOutDate }, checkOutDate: { $gt: checkInDate } },
+                { checkInDate: { $gte: checkInDate, $lte: checkOutDate } },
+            ],
+        });
+        // Respond with availability status
+        res.send({ available: !existingBooking });
     } catch (error) {
         console.log(err);
         // res.send(err);
     }
-  });
-  
+});
+
 
 // // get
 
@@ -279,6 +279,68 @@ app.delete("/bookings/:id", async (req, res) => {
     }
 })
 
+
+// userReview Room 
+
+app.post("/userReviewsForRoom", async (req, res) => {
+    try {
+        const body = req.body;
+
+        // Check if the user has already reviewed this room
+        const existingReview = await userRoomReviewCollection.findOne({
+            username: body.username,
+            roomNum: body.roomNum,
+        });
+
+        if (existingReview) {
+            // User has already reviewed this room, send an error response
+            return res.status(400).json({ error: "User has already reviewed this room." });
+        }
+
+        // User hasn't reviewed this room yet, proceed with insertion
+        const result = await userRoomReviewCollection.insertOne(body);
+        console.log(result);
+        res.send(result);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
+// app.post("/userReviewsForRoom", async (req, res) => {
+//     try {
+
+//         const body = req.body;
+//         const result = await userRoomReviewCollection.insertOne(body);
+//         console.log(result);
+//         res.send(result);
+//         console.log(result);
+//         res.send(result);
+//     } catch (err) {
+//         console.log(err);
+//         // res.send(err);
+//     }
+// })
+
+app.get('/userReviewsForRoom', async (req, res) => {
+    try {
+        const result = await userRoomReviewCollection.find().toArray();
+        res.send(result);
+    } catch (err) {
+        console.log(err);
+    }
+})
+
+app.get("/userReviewsForRoom/:id", async (req, res) => {
+    try {
+        const bookingRoom = await userRoomReviewCollection.findOne({ _id: new ObjectId(req.params.id) });
+        console.log(bookingRoom);
+        res.send(bookingRoom);
+    } catch (error) {
+        console.log(error);
+    }
+})
 
 
 
