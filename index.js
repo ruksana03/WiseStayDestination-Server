@@ -125,7 +125,7 @@ app.post("/subscription", async (req, res) => {
         res.send(result);
     } catch (err) {
         console.log(err);
-        res.send(err);
+        // res.send(err);
     }
 })
 
@@ -162,7 +162,7 @@ app.post("/reviews", async (req, res) => {
         res.send(result);
     } catch (err) {
         console.log(err);
-        res.send(err);
+        // res.send(err);
     }
 })
 
@@ -200,7 +200,7 @@ app.post("/booking", async (req, res) => {
         res.send(result);
     } catch (err) {
         console.log(err);
-        res.send(err);
+        // res.send(err);
     }
 })
 
@@ -220,8 +220,8 @@ app.get('/checkAvailability', async (req, res) => {
       // Respond with availability status
       res.send({ available: !existingBooking });
     } catch (error) {
-      console.error('Error while checking room availability:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+        console.log(err);
+        // res.send(err);
     }
   });
   
