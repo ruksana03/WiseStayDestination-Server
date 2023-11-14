@@ -328,9 +328,6 @@ app.get("/userReviewsForRoom/:id", async (req, res) => {
 })
 
 
-
-// Add this endpoint to your server.js file
-
 // Check room availability
 app.get('/availableRooms', async (req, res) => {
     try {
@@ -351,10 +348,9 @@ app.get('/availableRooms', async (req, res) => {
         const bookedRoomNums = existingBookings.map((booking) => booking.roomNum);
         const availableRooms = allRooms.filter((room) => !bookedRoomNums.includes(room.roomNo));
 
-        res.json({ availableRooms });
+        res.send({ availableRooms });
     } catch (error) {
-        console.error('Error checking room availability:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        console.log(error);
     }
 });
 
