@@ -328,6 +328,38 @@ app.get("/userReviewsForRoom/:id", async (req, res) => {
 })
 
 
+
+// Add this endpoint to your server.js file
+
+// Check room availability
+app.get('/availableRooms', async (req, res) => {
+    try {
+        const { checkInDate, checkOutDate } = req.query;
+
+        // Check if there are any bookings for the given date range
+        const existingBookings = await bookingCollection.find({
+            $or: [
+                { checkInDate: { $lt: new Date(checkOutDate) }, checkOutDate: { $gt: new Date(checkInDate) } },
+                { checkOutDate: { $gt: new Date(checkInDate) } },
+            ],
+        }).toArray();
+
+        // Get all rooms
+        const allRooms = await roomCollection.find().toArray();
+
+        // Filter out booked rooms
+        const bookedRoomNums = existingBookings.map((booking) => booking.roomNum);
+        const availableRooms = allRooms.filter((room) => !bookedRoomNums.includes(room.roomNo));
+
+        res.json({ availableRooms });
+    } catch (error) {
+        console.error('Error checking room availability:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+
 app.get('/', (req, res) => {
     res.send("running")
 })
